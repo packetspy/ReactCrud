@@ -1,17 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import PhotoItem from '../components/PhotoItem';
-import api from '../services/api';
+import { PhotoItem } from '../components/PhotoItem';
+import { photoService } from '../services/photoService';
 
-const HomeScreen = () => {
+export const HomeScreen = () => {
   const [photos, setPhotos] = useState(null);
 
   const fetchPhotos = async () => {
     try {
-      const response = await api.getAllPhotos();
+      const response = await photoService.getAllPhotos();
       setPhotos(response.data);
     } catch (error) {
       alert('Failed to fetch photos =/');
+    }
+  };
+
+  const removePhoto = async (id) => {
+    try {
+      //await photoService.deletePhoto(photoId);
+      //alert('Photo deleted!');
+      console.log('Delete acionado', id);
+    } catch (error) {
+      alert('Failed to remove photo.');
     }
   };
 
@@ -21,7 +31,7 @@ const HomeScreen = () => {
 
   if (!photos) {
     return (
-      <Container>
+      <Container style={{ padding: 16, textAlign: 'center' }}>
         <Col>
           <p>Loading photos</p>
         </Col>
@@ -30,19 +40,22 @@ const HomeScreen = () => {
   }
 
   return (
-    <Container>
+    <Container style={{ padding: 16 }}>
       <Row>
-        {photos.map((item) => (
-          <PhotoItem
-            key={item.id}
-            title={item.title}
-            url={item.url}
-            thumbnailUrl={item.thumbnailUrl}
-          />
-        ))}
+        {photos
+          .reverse()
+          .slice(0, 50)
+          .map((photoItem) => (
+            <PhotoItem
+              key={photoItem.id}
+              id={photoItem.id}
+              title={photoItem.title}
+              url={photoItem.url}
+              thumbnailUrl={photoItem.thumbnailUrl}
+              removePhoto={removePhoto}
+            />
+          ))}
       </Row>
     </Container>
   );
 };
-
-export default HomeScreen;
